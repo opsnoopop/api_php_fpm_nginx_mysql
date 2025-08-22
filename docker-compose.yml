@@ -1,0 +1,63 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    image: nginx:1_27_alpine_custom
+    container_name: container_nginx
+    restart: always
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+    networks:
+      network_php:
+        ipv4_address: 172.16.0.10
+
+  php:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    image: php:8_4_fpm_alpine_custom
+    container_name: container_php
+    restart: always
+    networks:
+      network_php:
+        ipv4_address: 172.16.0.11
+
+  database:
+    image: mysql:8.4.5
+    container_name: container_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      network_php:
+        ipv4_address: 172.16.0.12
+
+  adminer:
+    image: adminer:5-standalone
+    container_name: container_adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    networks:
+      network_php:
+        ipv4_address: 172.16.0.13
+
+networks:
+  network_php:
+    name: global_php
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
