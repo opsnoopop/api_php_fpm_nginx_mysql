@@ -1,31 +1,35 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+// import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+import { htmlReport } from "./bundle.js";
 
 // Test configuration
 export const options = {
   discardResponseBodies: true, // ไม่เก็บ response body เพื่อประหยัดหน่วยความจำและประมวลผลได้เร็วขึ้น
   scenarios: {
-    ramp_rps: {
-      // executor: 'constant-arrival-rate', // ใช้ executor แบบ constant-arrival-rate: ยิง request ด้วยความเร็วคงที่
-      executor: 'ramping-arrival-rate',
-      startRate: 1000,
+    ramping: {
+      executor: 'ramping-arrival-rate', // ใช้ executor แบบ ramping-arrival-rate: ยิง request ด้วยความเร็วที่เพิ่มขึ้นอย่างต่อเนื่อง
       timeUnit: '1s', // หน่วยเวลาของ rate: ต่อ 1 วินาที
-      preAllocatedVUs: 4000,
-      maxVUs: 20000,
+      startRate: 1000, // เริ่มต้นด้วย 1000 คนที่ทำงานพร้อมกัน
+      preAllocatedVUs: 5000, // สร้าง Virtual Users (VU) ล่วงหน้า 5000 ตัว
+      maxVUs: 10000, // สร้าง Virtual Users (VU) สูงสุด 10000 ตัว
       stages: [
-        { duration: '10s', target: 3000 }, // warm-up
-        { duration: '10s', target: 5000 }, // climb
-        { duration: '10s', target: 8000 }, // hold (เริ่มเห็นเพดาน?)
-        { duration: '10s', target: 10000 }, // hold สูง
+        { duration: '10s', target: 2000 },
+        { duration: '10s', target: 4000 },
+        { duration: '10s', target: 6000 },
+        { duration: '10s', target: 8000 },
+        { duration: '10s', target: 10000 },
         { duration: '10s', target: 0 },    // ramp-down
       ],
       gracefulStop: '10s',
     },
   },
   thresholds: {
-    http_req_failed: ['rate<0.01'],
-    http_req_duration: ['p(95)<500', 'p(99)<1200'],
+    http_req_failed: [{ threshold: 'rate<0.01', abortOnFail: true }], // หยุดทันทีเมื่อ fail (ประหยัดเวลา/ทรัพยากร) ใส่ abortOnFail
+    http_req_duration: [
+      { threshold: 'p(95)<500', abortOnFail: false },
+      'p(99)<1200'
+    ],
     checks: ['rate>0.99'],
   },
 };
@@ -38,8 +42,8 @@ const headers = {
 
 // Simulated user behavior
 export default function () {
-  // GET users/:id
-  let res = http.get("http://container_nginx/users/1");
+  // GET
+  let res = http.get("http://container_nginx");
 
   // Validate response status
   check(res, { "status was 200": (r) => r.status == 200 });
@@ -60,11 +64,11 @@ export function handleSummary(data) {
   const minutes = (utcPlus7.getUTCMinutes() < 10) ? "0" + utcPlus7.getUTCMinutes() : utcPlus7.getUTCMinutes();
   const seconds = (utcPlus7.getUTCSeconds() < 10) ? "0" + utcPlus7.getUTCSeconds() : utcPlus7.getUTCSeconds();
 
-  const filename = "/k6/3_get_user_by_id_" + year +  month + day + "_" + hours + minutes + seconds + ".html";
+  const filename = "/k6/1_ramping_health_check_" + year +  month + day + "_" + hours + minutes + seconds + ".html";
   
   return {
     [filename]: htmlReport(data, {
-      title: "get_user_by_id_api_php_fpm_nginx_mysql_" + year + month + day + "_" + hours + minutes + seconds
+      title: "1_ramping_health_check_api_php_fpm_nginx_mysql_" + year + month + day + "_" + hours + minutes + seconds
     }),
   };
 }
