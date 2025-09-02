@@ -62,43 +62,18 @@ CREATE TABLE IF NOT EXISTS testdb.users (
 ## API Endpoints
 
 ### Health Check
-- **URL:** http://localhost/
-- **Method:** GET
-- **Response:**
-```json
-{
-  "message": "Hello World from PHP"
-}
+```bash
+curl -X GET http://localhost/
 ```
 
 ### Create user
-- **URL:** http://localhost/users
-- **Method:** POST
-- **Request**
-```json
-{
-  "username":"optest",
-  "email":"opsnoopop@hotmail.com"
-}
-```
-- **Response:**
-```json
-{
-  "message":"User created successfully",
-  "user_id":1
-}
+```bash
+curl -X POST http://localhost/users -H 'Content-Type: application/json' -d '{"username":"optest","email":"opsnoopop@hotmail.com"}'
 ```
 
 ### Get user
-- **URL:** http://localhost/users/1
-- **Method:** GET
-- **Response:**
-```json
-{
-  "user_id":1,
-  "username":"optest",
-  "email":"opsnoopop@hotmail.com"
-}
+```bash
+curl -X GET http://localhost/users/1
 ```
 
 

@@ -38,6 +38,12 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql:/var/lib/mysql
+      - ./mysql_initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
     networks:
       network_php:
         ipv4_address: 172.16.0.12
