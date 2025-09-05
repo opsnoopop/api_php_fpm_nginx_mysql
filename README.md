@@ -12,9 +12,9 @@ A simple PHP-FPM Nginx API application and MySQL, containerized with Docker.
 - pdo_mysql
 - opcache
 
-**NGINX Container: FROM nginx:1.27-alpine**
+**Nginx Container: FROM nginx:1.27-alpine**
 - OS Alpine Linux: 3.21.3
-- NGINX: 1.27
+- Nginx: 1.27
 
 **MySQL Container: FROM mysql:8.4.5**
 - OS Oracle Linux Server: 9.6
@@ -124,7 +124,7 @@ docker run \
 --name container_ubuntu_tool \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 opsnoopop/ubuntu-tool:1.0 \
 sysbench \
 --threads=2 \
@@ -146,7 +146,7 @@ docker run \
 --name container_ubuntu_tool \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 opsnoopop/ubuntu-tool:1.0 \
 sysbench \
 --threads=2 \
@@ -168,7 +168,7 @@ docker run \
 --name container_ubuntu_tool \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 opsnoopop/ubuntu-tool:1.0 \
 sysbench \
 --threads=2 \
@@ -193,7 +193,7 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 -v ./k6/:/k6/ \
 grafana/k6:1.1.0 \
 run /k6/k6_1_ramping_health_check.js
@@ -205,7 +205,7 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 -v ./k6/:/k6/ \
 grafana/k6:1.1.0 \
 run /k6/k6_2_ramping_create_user.js
@@ -217,7 +217,7 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_php \
+--network global_optest \
 -v ./k6/:/k6/ \
 grafana/k6:1.1.0 \
 run /k6/k6_3_ramping_get_user_by_id.js

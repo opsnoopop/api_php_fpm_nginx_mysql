@@ -42,7 +42,7 @@ switch (true) {
 
     // GET /
     case $uri === '/' && $method === 'GET':
-        send_json(['message' => 'Hello World from PHP']);
+        send_json(['message' => 'Hello World from PHP (Nginx + FPM + MySQL)']);
 
     // POST /users
     case $uri === '/users' && $method === 'POST':

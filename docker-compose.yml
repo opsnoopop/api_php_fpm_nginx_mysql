@@ -7,22 +7,25 @@ services:
     container_name: container_nginx
     restart: always
     depends_on:
-      - php
+      - api
     ports:
       - "80:80"
     networks:
-      network_php:
+      network_optest:
         ipv4_address: 172.16.0.10
 
-  php:
+  api:
     build:
       context: .
       dockerfile: php/Dockerfile
     image: php:8_4_fpm_alpine_custom
     container_name: container_php
     restart: always
+    depends_on:
+      database:
+        condition: service_healthy
     networks:
-      network_php:
+      network_optest:
         ipv4_address: 172.16.0.11
 
   database:
@@ -45,7 +48,7 @@ services:
       timeout: 3s
       retries: 30
     networks:
-      network_php:
+      network_optest:
         ipv4_address: 172.16.0.12
 
   adminer:
@@ -57,12 +60,12 @@ services:
     depends_on:
       - database
     networks:
-      network_php:
+      network_optest:
         ipv4_address: 172.16.0.13
 
 networks:
-  network_php:
-    name: global_php
+  network_optest:
+    name: global_optest
     ipam:
       driver: default
       config:
